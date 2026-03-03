@@ -5,8 +5,11 @@ import { VehiculeModule } from './vehicules/vehicule.module';
 import { InvoiceModule } from './invoices/invoice.module';
 import { ProductModule } from './products/product.module';
 import { WorkersModule } from './workers/workers.module';
+import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from './customers/entity/customer.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Vehicule } from './vehicules/entity/vehicule.entity';
 
 @Module({
   imports: [
@@ -16,18 +19,41 @@ import { Customer } from './customers/entity/customer.entity';
     InvoiceModule,
     ProductModule,
     WorkersModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      database: 'optimanageDB',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'admin',
-      synchronize: true,
-      entities: [Customer],
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        const isTest = process.env.NODE_ENV === 'test';
+        if (isTest) {
+          return {
+            type: 'sqlite',
+            database: ':memory:',
+            synchronize: true,
+            entities: [Customer, Vehicule],
+            dropSchema: true,
+            logging: false,
+          };
+        }
+
+        return {
+          type: 'postgres',
+          database: config.get<string>('DB_NAME') || 'optimanageDB',
+          host: config.get<string>('DB_HOST') || 'localhost',
+          port: parseInt(config.get<string>('DB_PORT') ?? '5432', 10),
+          username: config.get<string>('DB_USERNAME') || 'postgres',
+          password: config.get<string>('DB_PASSWORD') || 'admin',
+          synchronize: process.env.NODE_ENV !== 'production', // Synchroniser uniquement en développement
+          entities: [Customer, Vehicule],
+          dropSchema: true, // Nettoie la base avant les tests
+          logging: false, // Désactive les logs pour les tests
+        };
+      },
     }),
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

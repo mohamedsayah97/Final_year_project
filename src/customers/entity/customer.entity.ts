@@ -21,9 +21,6 @@ export class Customer {
   address!: string;
   @Column()
   customerType!: string;
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
+  @CreateDateColumn()
   registrationDate!: Date;
 }
