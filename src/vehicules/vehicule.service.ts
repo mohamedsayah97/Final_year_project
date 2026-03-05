@@ -31,7 +31,8 @@ export class VehiculeService {
   public async updateVehiculeService(id: string, dto: UpdateVehiculeDto) {
     const vehicule = await this.getVehiculeByIdService(id);
     Object.assign(vehicule, dto);
-    return await this.vehiculeRepository.save(vehicule);
+    await this.vehiculeRepository.save(vehicule);
+    return await this.getVehiculeByIdService(id);
   }
 
   public async deleteVehiculeService(id: string) {

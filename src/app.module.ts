@@ -10,6 +10,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from './customers/entity/customer.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Vehicule } from './vehicules/entity/vehicule.entity';
+import { Supplier } from './supplier/entity/supplier.entity';
+import { SupplierModule } from './supplier/supplier.module';
+import { Worker } from './workers/entity/worker.entity';
 
 @Module({
   imports: [
@@ -19,6 +22,7 @@ import { Vehicule } from './vehicules/entity/vehicule.entity';
     InvoiceModule,
     ProductModule,
     WorkersModule,
+    SupplierModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
@@ -32,7 +36,7 @@ import { Vehicule } from './vehicules/entity/vehicule.entity';
             type: 'sqlite',
             database: ':memory:',
             synchronize: true,
-            entities: [Customer, Vehicule],
+            entities: [Customer, Vehicule, Supplier, Worker],
             dropSchema: true,
             logging: false,
           };
@@ -46,7 +50,7 @@ import { Vehicule } from './vehicules/entity/vehicule.entity';
           username: config.get<string>('DB_USERNAME') || 'postgres',
           password: config.get<string>('DB_PASSWORD') || 'admin',
           synchronize: process.env.NODE_ENV !== 'production', // Synchroniser uniquement en développement
-          entities: [Customer, Vehicule],
+          entities: [Customer, Vehicule, Supplier, Worker],
           dropSchema: true, // Nettoie la base avant les tests
           logging: false, // Désactive les logs pour les tests
         };

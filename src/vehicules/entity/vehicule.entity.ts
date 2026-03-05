@@ -39,8 +39,8 @@ export class Vehicule {
   currentDriverId!: string;
 
   @Column({
-    type: 'enum',
-    enum: ['available', 'in-use', 'maintenance', 'out-of-service'],
+    type: 'varchar',
+    length: 30,
     default: 'available',
   })
   status!: string;

@@ -10,7 +10,7 @@ import {
 @Entity()
 export class Supplier {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: string;
 
   @Column({ unique: true }) // Ajoute unique pour plus de sécurité
   supplier_code!: string;

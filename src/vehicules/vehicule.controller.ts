@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { VehiculeService } from './vehicule.service';
 import { CreateVehiculeDto } from './dtos/createVehicule.dto';
@@ -27,20 +28,20 @@ export class VehiculeController {
   }
 
   @Get(':id')
-  getVehiculeById(@Param('id') id: string) {
+  getVehiculeById(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.vehiculeService.getVehiculeByIdService(id);
   }
 
   @Put(':id')
   updateVehicule(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body(ValidationPipe) updateVehiculeDto: UpdateVehiculeDto,
   ) {
     return this.vehiculeService.updateVehiculeService(id, updateVehiculeDto);
   }
 
   @Delete(':id')
-  deleteVehicule(@Param('id') id: string) {
+  deleteVehicule(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.vehiculeService.deleteVehiculeService(id);
   }
 }
