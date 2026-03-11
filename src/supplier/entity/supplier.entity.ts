@@ -1,3 +1,4 @@
+import { User } from 'src/users/entity/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,14 +6,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   BeforeInsert,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
 export class Supplier {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid') // Changé en uuid pour correspondre au type string
   id!: string;
 
-  @Column({ unique: true }) // Ajoute unique pour plus de sécurité
+  @Column({ unique: true })
   supplier_code!: string;
 
   @Column()
@@ -35,6 +37,9 @@ export class Supplier {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updated_at!: Date;
+
+  @ManyToOne(() => User, (user) => user.suppliers)
+  user!: User;
 
   @BeforeInsert()
   generateSupplierCode() {

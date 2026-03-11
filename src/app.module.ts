@@ -13,6 +13,7 @@ import { Vehicule } from './vehicules/entity/vehicule.entity';
 import { Supplier } from './supplier/entity/supplier.entity';
 import { SupplierModule } from './supplier/supplier.module';
 import { Worker } from './workers/entity/worker.entity';
+import { User } from './users/entity/user.entity';
 
 @Module({
   imports: [
@@ -36,7 +37,7 @@ import { Worker } from './workers/entity/worker.entity';
             type: 'sqlite',
             database: ':memory:',
             synchronize: true,
-            entities: [Customer, Vehicule, Supplier, Worker],
+            entities: [Customer, Vehicule, Supplier, Worker, User],
             dropSchema: true,
             logging: false,
           };
@@ -50,7 +51,7 @@ import { Worker } from './workers/entity/worker.entity';
           username: config.get<string>('DB_USERNAME') || 'postgres',
           password: config.get<string>('DB_PASSWORD') || 'admin',
           synchronize: process.env.NODE_ENV !== 'production', // Synchroniser uniquement en développement
-          entities: [Customer, Vehicule, Supplier, Worker],
+          entities: [Customer, Vehicule, Supplier, Worker, User],
           dropSchema: true, // Nettoie la base avant les tests
           logging: false, // Désactive les logs pour les tests
         };

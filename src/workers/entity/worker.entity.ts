@@ -1,9 +1,11 @@
+import { User } from 'src/users/entity/user.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity({ name: 'workers' })
@@ -57,4 +59,7 @@ export class Worker {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  @ManyToOne(() => User, (user) => user.workers)
+  user!: User;
 }
