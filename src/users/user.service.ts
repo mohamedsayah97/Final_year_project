@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
 import { RegisterDto } from './dtos/register.dto';
@@ -69,5 +69,11 @@ export class userService {
     };
     const accesToken = await this.jwtService.signAsync(payload);
     return { accesToken };
+  }
+  //we used guard here
+  async getCurrentUserService(id: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('user not found');
+    return user;
   }
 }
