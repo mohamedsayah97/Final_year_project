@@ -32,8 +32,8 @@ export class CustomerService {
   public async updateCustomerService(id: string, dto: UpdateCustomerDto) {
     const customer = await this.getCustomerByIdService(id);
     Object.assign(customer, dto);
-    await this.customerRepository.save(customer);
-    return 'Customer updated successfully';
+    const updatedCustomer = await this.customerRepository.save(customer);
+    return updatedCustomer;
   }
 
   public async deleteCustomerService(id: string) {

@@ -32,10 +32,10 @@ export class Supplier {
   @Column()
   registration_number!: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn()
   created_at!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn()
   updated_at!: Date;
 
   @ManyToOne(() => User, (user) => user.suppliers)

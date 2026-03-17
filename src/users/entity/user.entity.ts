@@ -28,7 +28,7 @@ export class User {
   @Column()
   address!: string;
   @Column({
-    type: 'enum',
+    type: 'varchar',
     enum: UserRole,
     default: UserRole.ADMIN,
   })

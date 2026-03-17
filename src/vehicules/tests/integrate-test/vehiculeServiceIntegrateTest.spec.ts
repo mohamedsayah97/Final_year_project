@@ -8,6 +8,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VehiculeController } from '../../vehicule.controller';
 import { VehiculeService } from '../../vehicule.service';
 import { Vehicule } from '../../entity/vehicule.entity';
+import { User } from 'src/users/entity/user.entity';
+import { Customer } from 'src/customers/entity/customer.entity';
+import { Supplier } from 'src/supplier/entity/supplier.entity';
+import { Worker } from 'src/workers/entity/worker.entity';
 import { CreateVehiculeDto } from '../../dtos/createVehicule.dto';
 import { UpdateVehiculeDto } from '../../dtos/updateVehicule.dto';
 
@@ -35,11 +39,11 @@ describe('VehiculeController Integration Tests', () => {
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
-          entities: [Vehicule],
+          entities: [Vehicule, User, Customer, Supplier, Worker],
           synchronize: true,
           logging: false,
         }),
-        TypeOrmModule.forFeature([Vehicule]),
+        TypeOrmModule.forFeature([Vehicule, User, Customer, Supplier, Worker]),
       ],
       controllers: [VehiculeController],
       providers: [VehiculeService],
