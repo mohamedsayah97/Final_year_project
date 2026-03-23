@@ -4,22 +4,28 @@ import { Repository } from 'typeorm';
 import { CreateWorkerDto } from './dtos/createWorker.dto';
 import { Worker } from './entity/worker.entity';
 import { UpdateWorkerDto } from './dtos/updateWorker.dto';
+import { userService } from 'src/users/user.service';
 
 @Injectable()
 export class WorkerService {
   constructor(
     @InjectRepository(Worker)
     private readonly workerRepository: Repository<Worker>,
+    private readonly userService: userService,
   ) {}
 
-  public async createWorkerService(dto: CreateWorkerDto) {
-    const newWorker = this.workerRepository.create(dto);
+  public async createWorkerService(dto: CreateWorkerDto, userId: string) {
+    const user = await this.userService.getCurrentUserService(userId);
+    const newWorker = this.workerRepository.create({
+      ...dto,
+      user,
+    });
     const savedWorker = await this.workerRepository.save(newWorker);
     return 'Worker created successfully';
   }
 
   public async getAllWorkersService() {
-    return await this.workerRepository.find();
+    return await this.workerRepository.find(); //ici {relations: {user: true, anything else: true}}. n'est pas une maniére globale. dans les methodes
   }
 
   public async getWorkerByIdService(id: string) {

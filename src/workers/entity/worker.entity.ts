@@ -60,6 +60,6 @@ export class Worker {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.workers)
+  @ManyToOne(() => User, (user) => user.workers) //, {eager: true} => fetch pour tous les utilisateurs. une maniére global
   user!: User;
 }

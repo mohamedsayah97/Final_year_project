@@ -6,19 +6,30 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { WorkerService } from './worker.service';
 import { CreateWorkerDto } from './dtos/createWorker.dto';
 import { UpdateWorkerDto } from './dtos/updateWorker.dto';
+import { AuthRolesGuard } from 'src/users/guards/auth-roles.guard';
+import { Roles } from 'src/users/decorators/user-role.decorator';
+import { UserRole } from 'src/utils/enums';
+import { CurrentUser } from 'src/users/decorators/current-user.decorator';
+import type { JWTPayloadType } from 'src/utils/types';
 
 @Controller('workers')
 export class WorkersController {
   constructor(private readonly workerService: WorkerService) {}
 
   @Post('create')
-  createWorker(@Body(ValidationPipe) createWorkerDto: CreateWorkerDto) {
-    return this.workerService.createWorkerService(createWorkerDto);
+  @UseGuards(AuthRolesGuard) //déchiffrement du token,il faut importer jwtmodule dans service module
+  @Roles(UserRole.ADMIN, UserRole.RH) //vérifier les roles
+  createWorker(
+    @Body(ValidationPipe) createWorkerDto: CreateWorkerDto,
+    @CurrentUser() Payload: JWTPayloadType,
+  ) {
+    return this.workerService.createWorkerService(createWorkerDto, Payload.id);
   }
 
   @Get('all')
@@ -32,6 +43,8 @@ export class WorkersController {
   }
 
   @Put(':id')
+  @UseGuards(AuthRolesGuard) //déchiffrement du token,il faut importer jwtmodule dans service module
+  @Roles(UserRole.ADMIN, UserRole.RH) //vérifier les roles
   updateWorker(
     @Param('id') id: string,
     @Body(ValidationPipe) updateWorkerDto: UpdateWorkerDto,
@@ -40,6 +53,8 @@ export class WorkersController {
   }
 
   @Delete(':id')
+  @UseGuards(AuthRolesGuard) //déchiffrement du token,il faut importer jwtmodule dans service module
+  @Roles(UserRole.ADMIN, UserRole.RH) //vérifier les roles
   deleteWorker(@Param('id') id: string) {
     return this.workerService.deleteWorkerService(id);
   }
