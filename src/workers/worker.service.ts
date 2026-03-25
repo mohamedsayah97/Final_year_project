@@ -29,7 +29,7 @@ export class WorkerService {
   }
 
   public async getWorkerByIdService(id: string) {
-    const worker = await this.workerRepository.findOneBy({ id });
+    const worker = await this.workerRepository.findOneBy({ id }); //ici {relations: {user: true, anything else: true}}. n'est pas une maniére globale. dans les methodes
     if (!worker) {
       throw new NotFoundException(`Worker with ID ${id} not found`);
     }
