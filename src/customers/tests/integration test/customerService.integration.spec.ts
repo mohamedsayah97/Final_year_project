@@ -2,15 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CustomerService } from '../../customer.service';
-import { CustomerController } from '../../customer.controller';
 import { Customer } from '../../entity/customer.entity';
 import { CreateCustomerDto } from '../../dtos/create-customer.dto';
 import { UpdateCustomerDto } from '../../dtos/update-customer.dto';
 import { Repository } from 'typeorm';
+import { userService } from 'src/users/user.service';
 
 describe('CustomerService Integration Tests', () => {
   let customerService: CustomerService;
-  let customerController: CustomerController;
   let customerRepository: Repository<Customer>;
   let customersData: Customer[] = [];
 
@@ -46,6 +45,16 @@ describe('CustomerService Integration Tests', () => {
   };
 
   beforeAll(async () => {
+    const mockUserService = {
+      getCurrentUserService: jest.fn(async (userId) => ({
+        id: userId,
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        role: 'admin',
+      })),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CustomerService,
@@ -53,12 +62,14 @@ describe('CustomerService Integration Tests', () => {
           provide: getRepositoryToken(Customer),
           useValue: mockRepository,
         },
+        {
+          provide: userService,
+          useValue: mockUserService,
+        },
       ],
-      controllers: [CustomerController],
     }).compile();
 
     customerService = module.get<CustomerService>(CustomerService);
-    customerController = module.get<CustomerController>(CustomerController);
     customerRepository = module.get<Repository<Customer>>(
       getRepositoryToken(Customer),
     );

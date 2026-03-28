@@ -3,6 +3,11 @@ import { CustomerController } from '../../customer.controller';
 import { CustomerService } from '../../customer.service';
 import { CreateCustomerDto } from '../../dtos/create-customer.dto';
 import { UpdateCustomerDto } from '../../dtos/update-customer.dto';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { Reflector } from '@nestjs/core';
+import { AuthRolesGuard } from 'src/users/guards/auth-roles.guard';
+import { userService } from 'src/users/user.service';
 // import { ValidationPipe } from '@nestjs/common';
 
 // Mock du CustomerService
@@ -19,6 +24,34 @@ describe('CustomerController', () => {
   let customerService: CustomerService;
 
   beforeEach(async () => {
+    const mockUserService = {
+      getCurrentUserService: jest.fn(async (userId) => ({
+        id: userId,
+        firstName: 'Test',
+        lastName: 'User',
+        email: 'test@example.com',
+        role: 'admin',
+      })),
+    };
+
+    const mockJwtService = {
+      verifyAsync: jest.fn(async () => ({
+        id: 'test-user-id',
+        email: 'test@example.com',
+      })),
+    };
+
+    const mockConfigService = {
+      get: jest.fn((key) => {
+        if (key === 'JWT_SECRET_KEY') return 'test-secret-key';
+        return null;
+      }),
+    };
+
+    const mockReflector = {
+      getAllAndOverride: jest.fn(() => ['admin']),
+    };
+
     const module = await Test.createTestingModule({
       controllers: [CustomerController],
       providers: [
@@ -26,6 +59,23 @@ describe('CustomerController', () => {
           provide: CustomerService,
           useValue: mockCustomerService,
         },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
+        },
+        {
+          provide: Reflector,
+          useValue: mockReflector,
+        },
+        {
+          provide: userService,
+          useValue: mockUserService,
+        },
+        AuthRolesGuard,
       ],
     }).compile();
 
@@ -52,6 +102,11 @@ describe('CustomerController', () => {
         customerType: 'Regular',
       };
 
+      const mockPayload = {
+        id: 'test-user-id',
+        email: 'test@example.com',
+      };
+
       const expectedResult = {
         id: '1',
         ...createCustomerDto,
@@ -60,11 +115,12 @@ describe('CustomerController', () => {
 
       mockCustomerService.createCustomerService.mockResolvedValue(expectedResult);
 
-      const result = await customerController.createCustomer(createCustomerDto);
+      const result = await customerController.createCustomer(createCustomerDto, mockPayload as any);
 
       expect(result).toEqual(expectedResult);
       expect(mockCustomerService.createCustomerService).toHaveBeenCalledWith(
         createCustomerDto,
+        mockPayload.id,
       );
     });
 
@@ -77,12 +133,17 @@ describe('CustomerController', () => {
         customerType: 'Regular',
       };
 
+      const mockPayload = {
+        id: 'test-user-id',
+        email: 'test@example.com',
+      };
+
       mockCustomerService.createCustomerService.mockRejectedValue(
         new Error('Creation failed'),
       );
 
       await expect(
-        customerController.createCustomer(createCustomerDto),
+        customerController.createCustomer(createCustomerDto, mockPayload as any),
       ).rejects.toThrow('Creation failed');
     });
   });
