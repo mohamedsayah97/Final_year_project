@@ -1,4 +1,3 @@
-import { User } from 'src/users/entity/user.entity';
 import {
   Column,
   Entity,
@@ -7,6 +6,7 @@ import {
   UpdateDateColumn,
   ManyToOne,
 } from 'typeorm';
+import { User } from 'src/users/entity/user.entity';
 
 @Entity({ name: 'workers' })
 export class Worker {
@@ -60,6 +60,6 @@ export class Worker {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  @ManyToOne(() => User, (user) => user.workers) //, {eager: true} => fetch pour tous les utilisateurs. une maniére global
+  @ManyToOne(() => User, (user: User) => user.workers)
   user!: User;
 }

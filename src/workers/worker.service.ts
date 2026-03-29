@@ -20,7 +20,7 @@ export class WorkerService {
       ...dto,
       user,
     });
-    const savedWorker = await this.workerRepository.save(newWorker);
+    await this.workerRepository.save(newWorker);
     return 'Worker created successfully';
   }
 

@@ -1,4 +1,3 @@
-import { User } from 'src/users/entity/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -8,6 +7,7 @@ import {
   BeforeInsert,
   ManyToOne,
 } from 'typeorm';
+import { User } from 'src/users/entity/user.entity';
 
 @Entity()
 export class Supplier {
@@ -38,7 +38,7 @@ export class Supplier {
   @UpdateDateColumn()
   updated_at!: Date;
 
-  @ManyToOne(() => User, (user) => user.suppliers)
+  @ManyToOne(() => User, (user: User) => user.suppliers)
   user!: User;
 
   @BeforeInsert()

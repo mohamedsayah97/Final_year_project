@@ -1,8 +1,4 @@
-import { Customer } from 'src/customers/entity/customer.entity';
-import { Supplier } from 'src/supplier/entity/supplier.entity';
 import { UserRole } from 'src/utils/enums';
-import { Vehicule } from 'src/vehicules/entity/vehicule.entity';
-import { Worker } from 'src/workers/entity/worker.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +6,10 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Customer } from 'src/customers/entity/customer.entity';
+import { Supplier } from 'src/supplier/entity/supplier.entity';
+import { Vehicule } from 'src/vehicules/entity/vehicule.entity';
+import { Worker } from 'src/workers/entity/worker.entity';
 
 @Entity('users')
 export class User {
@@ -35,12 +35,15 @@ export class User {
   role!: UserRole;
   @CreateDateColumn()
   registrationDate!: Date;
-  @OneToMany(() => Customer, (customer) => customer.user)
+  @OneToMany(() => Customer, (customer: Customer) => customer.user)
   customers!: Customer[];
-  @OneToMany(() => Supplier, (supplier) => supplier.user)
+
+  @OneToMany(() => Supplier, (supplier: Supplier) => supplier.user)
   suppliers!: Supplier[];
-  @OneToMany(() => Vehicule, (vehicule) => vehicule.user)
+
+  @OneToMany(() => Vehicule, (vehicule: Vehicule) => vehicule.user)
   vehicules!: Vehicule[];
-  @OneToMany(() => Worker, (worker) => worker.user)
+
+  @OneToMany(() => Worker, (worker: Worker) => worker.user)
   workers!: Worker[];
 }

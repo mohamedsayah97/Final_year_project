@@ -1,8 +1,8 @@
-import { Test } from "@nestjs/testing";
-import { SupplierController } from "../../supplier.controller";
-import { SupplierService } from "../../supplier.service";
-import { CreateSupplierDto } from "../../dtos/create-supplier.dto";
-import { UpdateSupplierDto } from "../../dtos/update-supplier.dto";
+import { Test } from '@nestjs/testing';
+import { SupplierController } from '../../supplier.controller';
+import { SupplierService } from '../../supplier.service';
+import { CreateSupplierDto } from '../../dtos/createSupplier.dto';
+import { UpdateSupplierDto } from '../../dtos/updateSupplier.dto';
 
 // Mock du SupplierService
 const mockSupplierService = {
@@ -52,12 +52,16 @@ describe('SupplierController', () => {
       };
 
       // Utiliser mockResolvedValue pour les promesses
-      mockSupplierService.createSupplierService.mockResolvedValue(createSupplierDto);
+      mockSupplierService.createSupplierService.mockResolvedValue(
+        createSupplierDto,
+      );
 
       const result = await supplierController.createSupplier(createSupplierDto);
 
       expect(result).toEqual(createSupplierDto);
-      expect(mockSupplierService.createSupplierService).toHaveBeenCalledWith(createSupplierDto);
+      expect(mockSupplierService.createSupplierService).toHaveBeenCalledWith(
+        createSupplierDto,
+      );
     });
 
     it('should throw an error when creation fails', async () => {
@@ -70,11 +74,17 @@ describe('SupplierController', () => {
       };
 
       // Utiliser mockRejectedValue pour les erreurs de promesse
-      mockSupplierService.createSupplierService.mockRejectedValue(new Error('Failed to create supplier'));
+      mockSupplierService.createSupplierService.mockRejectedValue(
+        new Error('Failed to create supplier'),
+      );
 
       // Ajouter await devant expect
-      await expect(supplierController.createSupplier(createSupplierDto)).rejects.toThrow('Failed to create supplier');
-      expect(mockSupplierService.createSupplierService).toHaveBeenCalledWith(createSupplierDto);
+      await expect(
+        supplierController.createSupplier(createSupplierDto),
+      ).rejects.toThrow('Failed to create supplier');
+      expect(mockSupplierService.createSupplierService).toHaveBeenCalledWith(
+        createSupplierDto,
+      );
     });
   });
 
@@ -117,9 +127,13 @@ describe('SupplierController', () => {
     });
 
     it('should handle errors when getting all suppliers', async () => {
-      mockSupplierService.getAllSuppliersService.mockRejectedValue(new Error('Failed to get suppliers'));
+      mockSupplierService.getAllSuppliersService.mockRejectedValue(
+        new Error('Failed to get suppliers'),
+      );
 
-      await expect(supplierController.getAllSuppliers()).rejects.toThrow('Failed to get suppliers');
+      await expect(supplierController.getAllSuppliers()).rejects.toThrow(
+        'Failed to get suppliers',
+      );
     });
   });
 
@@ -139,14 +153,22 @@ describe('SupplierController', () => {
       const result = await supplierController.getSupplierById('1');
 
       expect(result).toEqual(supplier);
-      expect(mockSupplierService.getSupplierByIdService).toHaveBeenCalledWith('1');
+      expect(mockSupplierService.getSupplierByIdService).toHaveBeenCalledWith(
+        '1',
+      );
     });
 
     it('should throw an error when supplier not found', async () => {
-      mockSupplierService.getSupplierByIdService.mockRejectedValue(new Error('Supplier not found'));
+      mockSupplierService.getSupplierByIdService.mockRejectedValue(
+        new Error('Supplier not found'),
+      );
 
-      await expect(supplierController.getSupplierById('999')).rejects.toThrow('Supplier not found');
-      expect(mockSupplierService.getSupplierByIdService).toHaveBeenCalledWith('999');
+      await expect(supplierController.getSupplierById('999')).rejects.toThrow(
+        'Supplier not found',
+      );
+      expect(mockSupplierService.getSupplierByIdService).toHaveBeenCalledWith(
+        '999',
+      );
     });
   });
 
@@ -162,15 +184,23 @@ describe('SupplierController', () => {
 
       const updatedSupplier = {
         id: '1',
-        ...updateSupplierDto
+        ...updateSupplierDto,
       };
 
-      mockSupplierService.updateSupplierService.mockResolvedValue(updatedSupplier);
+      mockSupplierService.updateSupplierService.mockResolvedValue(
+        updatedSupplier,
+      );
 
-      const result = await supplierController.updateSupplier('1', updateSupplierDto);
+      const result = await supplierController.updateSupplier(
+        '1',
+        updateSupplierDto,
+      );
 
       expect(result).toEqual(updatedSupplier);
-      expect(mockSupplierService.updateSupplierService).toHaveBeenCalledWith('1', updateSupplierDto);
+      expect(mockSupplierService.updateSupplierService).toHaveBeenCalledWith(
+        '1',
+        updateSupplierDto,
+      );
     });
 
     it('should throw an error when update fails', async () => {
@@ -179,30 +209,47 @@ describe('SupplierController', () => {
         email: 'updatedsupplier@example.com',
       };
 
-      mockSupplierService.updateSupplierService.mockRejectedValue(new Error('Failed to update supplier'));
+      mockSupplierService.updateSupplierService.mockRejectedValue(
+        new Error('Failed to update supplier'),
+      );
 
-      await expect(supplierController.updateSupplier('1', updateSupplierDto)).rejects.toThrow('Failed to update supplier');
-      expect(mockSupplierService.updateSupplierService).toHaveBeenCalledWith('1', updateSupplierDto);
+      await expect(
+        supplierController.updateSupplier('1', updateSupplierDto),
+      ).rejects.toThrow('Failed to update supplier');
+      expect(mockSupplierService.updateSupplierService).toHaveBeenCalledWith(
+        '1',
+        updateSupplierDto,
+      );
     });
   });
 
   describe('deleteSupplier', () => {
     it('should delete a supplier successfully', async () => {
       const successResponse = { message: 'Supplier deleted successfully' };
-      
-      mockSupplierService.deleteSupplierService.mockResolvedValue(successResponse);
+
+      mockSupplierService.deleteSupplierService.mockResolvedValue(
+        successResponse,
+      );
 
       const result = await supplierController.deleteSupplier('1');
 
       expect(result).toEqual(successResponse);
-      expect(mockSupplierService.deleteSupplierService).toHaveBeenCalledWith('1');
+      expect(mockSupplierService.deleteSupplierService).toHaveBeenCalledWith(
+        '1',
+      );
     });
 
     it('should throw an error when deletion fails', async () => {
-      mockSupplierService.deleteSupplierService.mockRejectedValue(new Error('Failed to delete supplier'));
+      mockSupplierService.deleteSupplierService.mockRejectedValue(
+        new Error('Failed to delete supplier'),
+      );
 
-      await expect(supplierController.deleteSupplier('1')).rejects.toThrow('Failed to delete supplier');
-      expect(mockSupplierService.deleteSupplierService).toHaveBeenCalledWith('1');
+      await expect(supplierController.deleteSupplier('1')).rejects.toThrow(
+        'Failed to delete supplier',
+      );
+      expect(mockSupplierService.deleteSupplierService).toHaveBeenCalledWith(
+        '1',
+      );
     });
   });
 });

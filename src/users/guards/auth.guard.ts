@@ -7,6 +7,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import type { JWTPayloadType } from 'src/utils/types';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -15,16 +16,18 @@ export class AuthGuard implements CanActivate {
     private readonly configService: ConfigService,
   ) {}
   async canActivate(context: ExecutionContext) {
-    const request: Request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: JWTPayloadType }>();
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     //déchiffrement du token
     if (token && type === 'Bearer') {
       try {
-        const payload: JwtService = await this.jwtService.verifyAsync(token, {
+        const payload = (await this.jwtService.verifyAsync(token, {
           secret: this.configService.get<string>('JWT_SECRET_KEY'),
-        });
-        request['user'] = payload;
-      } catch (error) {
+        })) as unknown as JWTPayloadType;
+        request.user = payload;
+      } catch {
         throw new UnauthorizedException('acces denied, invalid token');
       }
     } else {

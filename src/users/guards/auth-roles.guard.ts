@@ -27,17 +27,16 @@ export class AuthRolesGuard implements CanActivate {
     ]);
     if (!roles || roles.length === 0) return false;
 
-    const request: Request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: JWTPayloadType }>();
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
     //déchiffrement du token
     if (token && type === 'Bearer') {
       try {
-        const payload: JWTPayloadType = await this.jwtService.verifyAsync(
-          token,
-          {
-            secret: this.configService.get<string>('JWT_SECRET_KEY'),
-          },
-        );
+        const payload = (await this.jwtService.verifyAsync(token, {
+          secret: this.configService.get<string>('JWT_SECRET_KEY'),
+        })) as unknown as JWTPayloadType;
         const user = await this.userService.getCurrentUserService(payload.id);
         if (!user) return false;
 
@@ -46,10 +45,10 @@ export class AuthRolesGuard implements CanActivate {
         const allowedRoles = roles.map((role) => String(role).toLowerCase());
 
         if (allowedRoles.includes(userRole)) {
-          request['user'] = payload;
+          request.user = payload;
           return true;
         }
-      } catch (error) {
+      } catch {
         throw new UnauthorizedException('acces denied, invalid token');
       }
     } else {

@@ -13,40 +13,57 @@ describe('CustomerService Integration Tests', () => {
   let customerRepository: Repository<Customer>;
   let customersData: Customer[] = [];
 
+  type MockCustomerRepository = Partial<Repository<Customer>> & {
+    create: jest.MockedFunction<
+      (dto: CreateCustomerDto & Partial<Customer>) => Customer
+    >;
+    save: jest.MockedFunction<(customer: Customer) => Promise<Customer>>;
+    find: jest.MockedFunction<() => Promise<Customer[]>>;
+    findOneBy: jest.MockedFunction<
+      (criteria: Partial<Customer>) => Promise<Customer | null>
+    >;
+    remove: jest.MockedFunction<(customer: Customer) => Promise<Customer>>;
+    clear: jest.MockedFunction<() => Promise<void>>;
+  };
+
   // Mock repository
-  const mockRepository = {
-    create: jest.fn((dto) => ({
-      ...dto,
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      registrationDate: new Date(),
-    })),
-    save: jest.fn(async (customer) => {
+  const mockRepository: MockCustomerRepository = {
+    create: jest.fn(
+      (dto: CreateCustomerDto) =>
+        ({
+          ...dto,
+          id: '550e8400-e29b-41d4-a716-446655440000',
+          registrationDate: new Date(),
+        }) as Customer,
+    ),
+    save: jest.fn((customer: Customer) => {
       // Ajouter aux données mock
-      const result = { ...customer };
+      const result: Customer = { ...customer };
       if (!customersData.find((c) => c.id === result.id)) {
         customersData.push(result);
       } else {
         const index = customersData.findIndex((c) => c.id === result.id);
         customersData[index] = result;
       }
-      return result;
+      return Promise.resolve(result);
     }),
-    find: jest.fn(async () => customersData),
-    findOneBy: jest.fn(async (criteria) => {
-      return customersData.find((c) => c.id === criteria.id) || null;
-    }),
-    remove: jest.fn(async (customer) => {
+    find: jest.fn(() => Promise.resolve(customersData)),
+    findOneBy: jest.fn((criteria: Partial<Customer>) =>
+      Promise.resolve(customersData.find((c) => c.id === criteria.id) || null),
+    ),
+    remove: jest.fn((customer: Customer) => {
       customersData = customersData.filter((c) => c.id !== customer.id);
-      return customer;
+      return Promise.resolve(customer);
     }),
-    clear: jest.fn(async () => {
+    clear: jest.fn(() => {
       customersData = [];
+      return Promise.resolve();
     }),
   };
 
   beforeAll(async () => {
     const mockUserService = {
-      getCurrentUserService: jest.fn(async (userId) => ({
+      getCurrentUserService: jest.fn((userId: string) => ({
         id: userId,
         firstName: 'Test',
         lastName: 'User',
@@ -60,7 +77,7 @@ describe('CustomerService Integration Tests', () => {
         CustomerService,
         {
           provide: getRepositoryToken(Customer),
-          useValue: mockRepository,
+          useValue: mockRepository as unknown as Repository<Customer>,
         },
         {
           provide: userService,
@@ -92,8 +109,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'individual',
       };
 
-      const result =
-        await customerService.createCustomerService(createCustomerDto);
+      const result = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       expect(result).toBeDefined();
       expect(result.id).toBeDefined();
@@ -124,8 +143,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'business',
       };
 
-      const result =
-        await customerService.createCustomerService(createCustomerDto);
+      const result = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       expect(result.registrationDate).toBeDefined();
       expect(result.registrationDate).toBeInstanceOf(Date);
@@ -187,9 +208,9 @@ describe('CustomerService Integration Tests', () => {
         registrationDate: new Date(),
       }));
 
-      await customerService.createCustomerService(customer1);
-      await customerService.createCustomerService(customer2);
-      await customerService.createCustomerService(customer3);
+      await customerService.createCustomerService(customer1, 'test-user-id');
+      await customerService.createCustomerService(customer2, 'test-user-id');
+      await customerService.createCustomerService(customer3, 'test-user-id');
 
       const result = await customerService.getAllCustomersService();
 
@@ -211,8 +232,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'individual',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       const result = await customerService.getCustomerByIdService(
         createdCustomer.id,
@@ -248,8 +271,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'individual',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       const updateCustomerDto: UpdateCustomerDto = {
         firstName: 'Karim Updated',
@@ -280,8 +305,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'business',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       // Mettre à jour seulement le prénom
       const updateCustomerDto: UpdateCustomerDto = {
@@ -322,8 +349,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'individual',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
 
       const result = await customerService.deleteCustomerService(
         createdCustomer.id,
@@ -358,8 +387,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'business',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
       let allCustomers = await customerService.getAllCustomersService();
       expect(allCustomers).toHaveLength(1);
 
@@ -381,8 +412,10 @@ describe('CustomerService Integration Tests', () => {
         customerType: 'individual',
       };
 
-      const createdCustomer =
-        await customerService.createCustomerService(createCustomerDto);
+      const createdCustomer = await customerService.createCustomerService(
+        createCustomerDto,
+        'test-user-id',
+      );
       expect(createdCustomer.id).toBeDefined();
 
       // READ
@@ -460,7 +493,9 @@ describe('CustomerService Integration Tests', () => {
 
       // Créer tous les clients
       const createdCustomers = await Promise.all(
-        customers.map((dto) => customerService.createCustomerService(dto)),
+        customers.map((dto) =>
+          customerService.createCustomerService(dto, 'test-user-id'),
+        ),
       );
 
       expect(createdCustomers).toHaveLength(3);

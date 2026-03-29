@@ -8,6 +8,8 @@ import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import { AuthRolesGuard } from 'src/users/guards/auth-roles.guard';
 import { userService } from 'src/users/user.service';
+import { UserRole } from 'src/utils/enums';
+import type { JWTPayloadType } from 'src/utils/types';
 // import { ValidationPipe } from '@nestjs/common';
 
 // Mock du CustomerService
@@ -25,7 +27,7 @@ describe('CustomerController', () => {
 
   beforeEach(async () => {
     const mockUserService = {
-      getCurrentUserService: jest.fn(async (userId) => ({
+      getCurrentUserService: jest.fn((userId: string) => ({
         id: userId,
         firstName: 'Test',
         lastName: 'User',
@@ -35,7 +37,7 @@ describe('CustomerController', () => {
     };
 
     const mockJwtService = {
-      verifyAsync: jest.fn(async () => ({
+      verifyAsync: jest.fn(() => ({
         id: 'test-user-id',
         email: 'test@example.com',
       })),
@@ -95,16 +97,17 @@ describe('CustomerController', () => {
   describe('createCustomer', () => {
     it('should create a customer successfully', async () => {
       const createCustomerDto: CreateCustomerDto = {
-        name: 'John Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         email: 'john.doe@example.com',
-        phone: '123-456-7890',
+        phoneNumber: '123-456-7890',
         address: '123 Main St',
         customerType: 'Regular',
       };
 
-      const mockPayload = {
+      const mockPayload: JWTPayloadType = {
         id: 'test-user-id',
-        email: 'test@example.com',
+        role: UserRole.ADMIN,
       };
 
       const expectedResult = {
@@ -113,9 +116,14 @@ describe('CustomerController', () => {
         createdAt: new Date(),
       };
 
-      mockCustomerService.createCustomerService.mockResolvedValue(expectedResult);
+      mockCustomerService.createCustomerService.mockResolvedValue(
+        expectedResult,
+      );
 
-      const result = await customerController.createCustomer(createCustomerDto, mockPayload as any);
+      const result = await customerController.createCustomer(
+        createCustomerDto,
+        mockPayload,
+      );
 
       expect(result).toEqual(expectedResult);
       expect(mockCustomerService.createCustomerService).toHaveBeenCalledWith(
@@ -126,16 +134,17 @@ describe('CustomerController', () => {
 
     it('should throw an error when creation fails', async () => {
       const createCustomerDto: CreateCustomerDto = {
-        name: 'John Doe',
+        firstName: 'John',
+        lastName: 'Doe',
         email: 'john.doe@example.com',
-        phone: '123-456-7890',
+        phoneNumber: '123-456-7890',
         address: '123 Main St',
         customerType: 'Regular',
       };
 
-      const mockPayload = {
+      const mockPayload: JWTPayloadType = {
         id: 'test-user-id',
-        email: 'test@example.com',
+        role: UserRole.ADMIN,
       };
 
       mockCustomerService.createCustomerService.mockRejectedValue(
@@ -143,7 +152,7 @@ describe('CustomerController', () => {
       );
 
       await expect(
-        customerController.createCustomer(createCustomerDto, mockPayload as any),
+        customerController.createCustomer(createCustomerDto, mockPayload),
       ).rejects.toThrow('Creation failed');
     });
   });
@@ -169,12 +178,16 @@ describe('CustomerController', () => {
         },
       ];
 
-      mockCustomerService.getAllCustomersService.mockResolvedValue(expectedCustomers);
+      mockCustomerService.getAllCustomersService.mockResolvedValue(
+        expectedCustomers,
+      );
 
       const result = await customerController.getAllCustomers();
 
       expect(result).toEqual(expectedCustomers);
-      expect(mockCustomerService.getAllCustomersService).toHaveBeenCalledTimes(1);
+      expect(mockCustomerService.getAllCustomersService).toHaveBeenCalledTimes(
+        1,
+      );
     });
 
     it('should return empty array when no customers exist', async () => {
@@ -183,7 +196,9 @@ describe('CustomerController', () => {
       const result = await customerController.getAllCustomers();
 
       expect(result).toEqual([]);
-      expect(mockCustomerService.getAllCustomersService).toHaveBeenCalledTimes(1);
+      expect(mockCustomerService.getAllCustomersService).toHaveBeenCalledTimes(
+        1,
+      );
     });
   });
 
@@ -199,7 +214,9 @@ describe('CustomerController', () => {
         customerType: 'Regular',
       };
 
-      mockCustomerService.getCustomerByIdService.mockResolvedValue(expectedCustomer);
+      mockCustomerService.getCustomerByIdService.mockResolvedValue(
+        expectedCustomer,
+      );
 
       const result = await customerController.getCustomerById(customerId);
 
@@ -227,9 +244,10 @@ describe('CustomerController', () => {
     it('should update a customer successfully', async () => {
       const customerId = '1';
       const updateCustomerDto: UpdateCustomerDto = {
-        name: 'John Updated',
+        firstName: 'John Updated',
+        lastName: 'Doe Updated',
         email: 'john.updated@example.com',
-        phone: '123-456-7890',
+        phoneNumber: '123-456-7890',
         address: '123 Main St',
         customerType: 'Regular',
       };
@@ -239,7 +257,9 @@ describe('CustomerController', () => {
         ...updateCustomerDto,
       };
 
-      mockCustomerService.updateCustomerService.mockResolvedValue(expectedResult);
+      mockCustomerService.updateCustomerService.mockResolvedValue(
+        expectedResult,
+      );
 
       const result = await customerController.updateCustomer(
         customerId,
@@ -256,7 +276,8 @@ describe('CustomerController', () => {
     it('should return null when updating non-existing customer', async () => {
       const customerId = '999';
       const updateCustomerDto: UpdateCustomerDto = {
-        name: 'Non Existing',
+        firstName: 'Non Existing',
+        lastName: 'Customer',
         email: 'non@example.com',
         phone: '123-456-7890',
         address: '123 Main St',

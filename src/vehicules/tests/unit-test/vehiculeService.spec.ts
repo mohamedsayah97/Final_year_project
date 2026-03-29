@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { VehiculeController } from '../../vehicule.controller';
 import { VehiculeService } from '../../vehicule.service';
-import { CreateVehiculeDto } from '../../dtos/create-vehicule.dto';
-import { UpdateVehiculeDto } from '../../dtos/update-vehicule.dto';
+import { CreateVehiculeDto } from '../../dtos/createVehicule.dto';
+import { UpdateVehiculeDto } from '../../dtos/updateVehicule.dto';
 
 // Mock du VehiculeService
 const mockVehiculeService = {
@@ -16,7 +16,7 @@ const mockVehiculeService = {
 describe('VehiculeController', () => {
   let vehiculeController: VehiculeController;
   let vehiculeService: VehiculeService;
-  
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [VehiculeController],
@@ -31,7 +31,7 @@ describe('VehiculeController', () => {
     vehiculeController = moduleRef.get<VehiculeController>(VehiculeController);
     vehiculeService = moduleRef.get<VehiculeService>(VehiculeService);
   });
-  
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -62,7 +62,9 @@ describe('VehiculeController', () => {
         createdAt: new Date(),
       };
 
-      mockVehiculeService.createVehiculeService.mockResolvedValue(expectedResult);
+      mockVehiculeService.createVehiculeService.mockResolvedValue(
+        expectedResult,
+      );
 
       const result = await vehiculeController.createVehicule(createVehiculeDto);
 
@@ -126,20 +128,24 @@ describe('VehiculeController', () => {
           status: 'assigned',
         },
       ];
-      
-      mockVehiculeService.getAllVehiculesService.mockResolvedValue(expectedVehicules);
+
+      mockVehiculeService.getAllVehiculesService.mockResolvedValue(
+        expectedVehicules,
+      );
 
       const result = await vehiculeController.getAllVehicules();
 
       expect(result).toEqual(expectedVehicules);
       expect(mockVehiculeService.getAllVehiculesService).toHaveBeenCalled();
     });
-    
+
     it('should handle errors when retrieving all vehicules', async () => {
       mockVehiculeService.getAllVehiculesService.mockRejectedValue(
         new Error('Retrieval failed'),
       );
-      await expect(vehiculeController.getAllVehicules()).rejects.toThrow('Retrieval failed');
+      await expect(vehiculeController.getAllVehicules()).rejects.toThrow(
+        'Retrieval failed',
+      );
     });
 
     it('should return an empty array when no vehicules are found', async () => {
@@ -165,8 +171,10 @@ describe('VehiculeController', () => {
           status: 'available',
         },
       ];
-      
-      mockVehiculeService.getAllVehiculesService.mockResolvedValue(expectedVehicules);
+
+      mockVehiculeService.getAllVehiculesService.mockResolvedValue(
+        expectedVehicules,
+      );
 
       const result = await vehiculeController.getAllVehicules();
       expect(result).toEqual(expectedVehicules);
@@ -199,8 +207,10 @@ describe('VehiculeController', () => {
           status: 'available',
         },
       ];
-      
-      mockVehiculeService.getAllVehiculesService.mockResolvedValue(expectedVehicules);
+
+      mockVehiculeService.getAllVehiculesService.mockResolvedValue(
+        expectedVehicules,
+      );
 
       const result = await vehiculeController.getAllVehicules();
       expect(result).toEqual(expectedVehicules);
@@ -234,7 +244,9 @@ describe('VehiculeController', () => {
         },
       ];
 
-      mockVehiculeService.getAllVehiculesService.mockResolvedValue(expectedVehicules);
+      mockVehiculeService.getAllVehiculesService.mockResolvedValue(
+        expectedVehicules,
+      );
 
       const result = await vehiculeController.getAllVehicules();
       expect(result).toEqual(expectedVehicules);
@@ -270,7 +282,9 @@ describe('VehiculeController', () => {
         },
       ];
 
-      mockVehiculeService.getAllVehiculesService.mockResolvedValue(expectedVehicules);
+      mockVehiculeService.getAllVehiculesService.mockResolvedValue(
+        expectedVehicules,
+      );
 
       const result = await vehiculeController.getAllVehicules();
       expect(result).toEqual(expectedVehicules);
@@ -294,8 +308,10 @@ describe('VehiculeController', () => {
         currentDriverId: '123e4567-e89b-12d3-a456-426614174000',
         status: 'available',
       };
-      
-      mockVehiculeService.getVehiculeByIdService.mockResolvedValue(expectedVehicule);
+
+      mockVehiculeService.getVehiculeByIdService.mockResolvedValue(
+        expectedVehicule,
+      );
 
       const result = await vehiculeController.getVehiculeById(vehiculeId);
       expect(result).toEqual(expectedVehicule);
@@ -304,10 +320,12 @@ describe('VehiculeController', () => {
     it('should handle errors when retrieving a vehicule by ID', async () => {
       const vehiculeId = '1';
       mockVehiculeService.getVehiculeByIdService.mockRejectedValue(
-        new Error('Vehicule not found')
+        new Error('Vehicule not found'),
       );
 
-      await expect(vehiculeController.getVehiculeById(vehiculeId)).rejects.toThrow('Vehicule not found');
+      await expect(
+        vehiculeController.getVehiculeById(vehiculeId),
+      ).rejects.toThrow('Vehicule not found');
     });
   });
 
@@ -330,10 +348,15 @@ describe('VehiculeController', () => {
         ...updateVehiculeDto,
         id: vehiculeId,
       };
-      
-      mockVehiculeService.updateVehiculeService.mockResolvedValue(expectedResult);
 
-      const result = await vehiculeController.updateVehicule(vehiculeId, updateVehiculeDto);
+      mockVehiculeService.updateVehiculeService.mockResolvedValue(
+        expectedResult,
+      );
+
+      const result = await vehiculeController.updateVehicule(
+        vehiculeId,
+        updateVehiculeDto,
+      );
       expect(result).toEqual(expectedResult);
     });
 
@@ -351,12 +374,14 @@ describe('VehiculeController', () => {
         currentDriverId: '123e4567-e89b-12d3-a456-426614174000',
         status: 'available',
       };
-      
+
       mockVehiculeService.updateVehiculeService.mockRejectedValue(
-        new Error('Failed to update vehicule')
+        new Error('Failed to update vehicule'),
       );
 
-      await expect(vehiculeController.updateVehicule(vehiculeId, updateVehiculeDto)).rejects.toThrow('Failed to update vehicule');
+      await expect(
+        vehiculeController.updateVehicule(vehiculeId, updateVehiculeDto),
+      ).rejects.toThrow('Failed to update vehicule');
     });
   });
 
@@ -371,10 +396,12 @@ describe('VehiculeController', () => {
     it('should handle errors when deleting a vehicule', async () => {
       const vehiculeId = '1';
       mockVehiculeService.deleteVehiculeService.mockRejectedValue(
-        new Error('Failed to delete vehicule')
+        new Error('Failed to delete vehicule'),
       );
-      
-      await expect(vehiculeController.deleteVehicule(vehiculeId)).rejects.toThrow('Failed to delete vehicule');
+
+      await expect(
+        vehiculeController.deleteVehicule(vehiculeId),
+      ).rejects.toThrow('Failed to delete vehicule');
     });
   });
 });
