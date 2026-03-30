@@ -1,8 +1,14 @@
-import { IsEmail, IsNotEmpty, IsOptional } from '@nestjs/class-validator';
-import { IsPhoneNumber, IsString, Length } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class UpdateCustomerDto {
-  @IsOptional() // Rendre optionnel pour la mise à jour
+  @IsOptional()
   @IsNotEmpty()
   @IsString()
   firstName?: string;
@@ -19,13 +25,13 @@ export class UpdateCustomerDto {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsPhoneNumber('TN') // Spécifiez le pays
+  @IsPhoneNumber('TN')
   phoneNumber?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  @Length(5, 100) // Length au lieu de Min/Max
+  @Length(5, 100)
   address?: string;
 
   @IsOptional()
