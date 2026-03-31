@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { productService } from './product.service';
 import { CreateProductDto } from './dtos/createProduct.dto';
-import { updateProductDto } from './dtos/updateProduct.dto';
+import { UpdateProductDto } from './dtos/updateProduct.dto';
 
 @Controller('products')
 export class productController {
@@ -34,7 +34,7 @@ export class productController {
   @Put(':id')
   updateProduct(
     @Param('id') id: string,
-    @Body(ValidationPipe) updateProduct: updateProductDto,
+    @Body(ValidationPipe) updateProduct: UpdateProductDto,
   ) {
     return this.productService.updateProductService(id, updateProduct);
   }
