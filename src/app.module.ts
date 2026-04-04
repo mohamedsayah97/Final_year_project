@@ -40,11 +40,11 @@ import { Invoice } from './invoices/entity/invoice.entity';
             database: ':memory:',
             synchronize: true,
             entities: [
+              User,
               Customer,
               Vehicule,
               Supplier,
               Worker,
-              User,
               Product,
               Invoice,
             ],

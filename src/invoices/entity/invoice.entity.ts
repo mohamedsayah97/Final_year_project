@@ -36,6 +36,6 @@ export class Invoice {
   @CreateDateColumn()
   createdAt!: Date;
 
-  @ManyToOne(() => User, (user: User) => user.invoices)
+  @ManyToOne(() => User)
   user!: User;
 }

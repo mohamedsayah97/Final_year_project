@@ -14,6 +14,6 @@ export class Product {
   quantity!: number;
   @Column()
   location!: string;
-  @ManyToOne(() => User, (user: User) => user.products)
+  @ManyToOne(() => User)
   user!: User;
 }
