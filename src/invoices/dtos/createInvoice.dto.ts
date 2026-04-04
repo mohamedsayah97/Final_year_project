@@ -1,10 +1,10 @@
 import {
-  IsDate,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
   Min,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateInvoiceDto {
@@ -13,11 +13,11 @@ export class CreateInvoiceDto {
   invoiceNumber!: string;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   date!: Date;
 
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   dueDate!: Date;
 
   @IsNotEmpty()

@@ -10,6 +10,8 @@ import { Customer } from 'src/customers/entity/customer.entity';
 import { Supplier } from 'src/supplier/entity/supplier.entity';
 import { Vehicule } from 'src/vehicules/entity/vehicule.entity';
 import { Worker } from 'src/workers/entity/worker.entity';
+import { Product } from 'src/products/entity/product.entity';
+import { Invoice } from 'src/invoices/entity/invoice.entity';
 
 @Entity('users')
 export class User {
@@ -46,4 +48,10 @@ export class User {
 
   @OneToMany(() => Worker, (worker: Worker) => worker.user)
   workers!: Worker[];
+
+  @OneToMany(() => Product, (product: Product) => product.user)
+  products!: Product[];
+
+  @OneToMany(() => Invoice, (invoice: Invoice) => invoice.user)
+  invoices!: Invoice[];
 }

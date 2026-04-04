@@ -4,16 +4,19 @@ import { Product } from './entity/product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dtos/createProduct.dto';
 import { UpdateProductDto } from './dtos/updateProduct.dto';
+import { userService } from 'src/users/user.service';
 
 @Injectable()
 export class productService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    private readonly userService: userService,
   ) {}
 
-  async createProductService(dto: CreateProductDto) {
-    const newProduct = this.productRepository.create(dto);
+  async createProductService(dto: CreateProductDto, userId: string) {
+    const user = await this.userService.getCurrentUserService(userId);
+    const newProduct = this.productRepository.create({ ...dto, user });
     return await this.productRepository.save(newProduct);
   }
 

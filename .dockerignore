@@ -1,0 +1,11 @@
+node_modules
+dist
+.env.*
+*.DS_Store
+*.log
+*.pem
+*.key
+*.crt
+.git
+.gitignore
+Dockerfile
