@@ -70,7 +70,7 @@ import { Invoice } from './invoices/entity/invoice.entity';
             Product,
             Invoice,
           ],
-          dropSchema: true, // Nettoie la base avant les tests
+          dropSchema: false, // Nettoie la base avant les tests
           logging: false, // Désactive les logs pour les tests
         };
       },
