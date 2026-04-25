@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: optima-manage-backend
+  # Changé de nodejs-devops-demo à optima-manage-backend pour refléter le vrai nom et le rôle
+spec:
+  replicas: 1
+  # Nombre de réplicas : 1 en développement, peut être augmenté en production
+  selector:
+    matchLabels:
+      app: optima-manage-backend
+      # Changé le label pour correspondre aux metadata
+  template:
+    metadata:
+      labels:
+        app: optima-manage-backend
+        # Changé le label pour correspondre au selector
+    spec:
+      containers:
+        - name: optima-manage-backend
+          # Changé le nom du container pour refléter l'application
+          image: optima-manage:latest
+          # Changé l'image Docker du nom générique au nom du projet
+          imagePullPolicy: IfNotPresent
+          # Le policy IfNotPresent est correct pour utiliser l'image locale
+          ports:
+            - containerPort: 3000
+              name: http
+              # Ajouté le nom du port pour meilleure traçabilité
+          envFrom:
+            - configMapRef:
+                name: optima-manage-config
+                # Changé de nodejs-devops-demo-config à optima-manage-config
+            - secretRef:
+                name: optima-manage-secret
+                # Changé de nodejs-devops-demo-secret à optima-manage-secret
+          # Ajouté liveness et readiness probes pour la stabilité en production
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            # Resources définit les limites pour éviter les surcharges
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: optima-manage-backend
+  # Changé de nodejs-devops-demo à optima-manage-backend pour cohérence
+spec:
+  selector:
+    app: optima-manage-backend
+    # Changé le selector pour correspondre aux metadata du deployment
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+      name: http
+      # Ajouté le nom du port pour meilleure traçabilité
+  type: LoadBalancer
+  # LoadBalancer expose le service à l'extérieur du cluster K8s

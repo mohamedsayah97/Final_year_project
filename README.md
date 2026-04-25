@@ -96,3 +96,38 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# promethus grafana and metrics 
+# Votre API
+curl http://localhost:3000
+
+# Métriques Prometheus
+curl http://localhost:3000/metrics
+
+# Prometheus lui-même
+curl http://localhost:9090
+
+# Grafana
+curl http://localhost:3001

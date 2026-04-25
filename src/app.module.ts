@@ -72,6 +72,18 @@ import { Invoice } from './invoices/entity/invoice.entity';
           ],
           dropSchema: false, // Nettoie la base avant les tests
           logging: false, // Désactive les logs pour les tests
+          // Fixé la DeprecationWarning: Utiliser extra pour éviter les concurrent queries
+          extra: {
+            // Pool de connexions pour éviter les requêtes concurrentes
+            max: 20,
+            // Idle timeout pour libérer les connexions
+            idleTimeoutMillis: 30000,
+          },
+          // Augmenté le pool max connections pour meilleure gestion des requêtes parallèles
+          pool: {
+            max: 20,
+            min: 2,
+          },
         };
       },
     }),

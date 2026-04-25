@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: optima-manage-grafana
+  # Changé de grafana à optima-manage-grafana pour le cohérence avec les autres services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: optima-manage-grafana
+      # Changé le label pour refléter le nom cohérent du projet
+  template:
+    metadata:
+      labels:
+        app: optima-manage-grafana
+        # Changé le label de metadata pour correspondre au selector
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          # Ajouté :latest pour s'assurer d'avoir la dernière version stable
+          ports:
+            - containerPort: 3000
+              # Changé de 3001 à 3000 - Grafana utilise 3000 par défaut, 3001 causera des conflits
+              name: grafana
+              # Ajouté le nom du port
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+              # Identifiant admin - peut être changé pour sécurité en production
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "optimanage_grafana_2024"
+              # Changé le mot de passe de "admin" à "optimanage_grafana_2024" pour sécurité
+            - name: GF_USERS_ALLOW_SIGN_UP
+              value: "false"
+              # Ajouté pour désactiver l'inscription des utilisateurs en production
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            # Ajouté health check pour s'assurer que Grafana fonctionne correctement
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: optima-manage-grafana
+  # Changé de grafana à optima-manage-grafana pour cohérence
+spec:
+  selector:
+    app: optima-manage-grafana
+    # Changé le selector pour correspondre au deployment
+  ports:
+    - protocol: TCP
+      port: 3000
+      # Changé de 3001 à 3000 pour correspondre au port du container
+      targetPort: 3000
+      # Changé de 3001 à 3000 pour correspondre au container port
+      name: grafana
+      # Ajouté le nom du port
+  type: LoadBalancer

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: optima-manage-config
+  # Changé de nodejs-devops-demo-config à optima-manage-config pour refléter le vrai nom de l'app
+data:
+  PORT: "3000"
+  NODE_ENV: "production"
+  # Changé de PORT générique à PROD - config pour l'environnement de production
+  JWT_EXPIRES_IN: "3h"
+  JWT_REFRESH_EXPIRES_IN: "100h"
+  # JWT unchanged - ces paramètres de sécurité sont appropriés
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: optima-manage-secret
+  # Changé de nodejs-devops-demo-secret à optima-manage-secret pour cohérence avec le ConfigMap
+type: Opaque
+stringData:
+  # Changé de POSTGRES_* aux variables réelles utilisées par app.module.ts (DB_*)
+  DB_HOST: "postgres"
+  # Changé de localhost vers 'postgres' - le nom du service K8s qui va héberger PostgreSQL
+  DB_PORT: "5432"
+  # Changé de 5433 vers 5432 - le port standard de PostgreSQL
+  DB_USERNAME: "optimanage_user"
+  # Changé de user_admin vers optimanage_user - pour plus de spécificité au projet
+  DB_PASSWORD: "OptimAnage@2024"
+  # Changé de user_password123 vers OptimAnage@2024 - mot de passe plus fort et unique au projet
+  DB_NAME: "optimanageDB"
+  # Ajouté DB_NAME - variable requise par app.module.ts pour le nom de la base de données
