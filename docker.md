@@ -1,5 +1,6 @@
 # 1. Build l'image
 docker build (-t backend_project) . <== must be in lowercase
+docker build -t optima-manage:latest .
 # autre:
 docker build --no-cache -t backend_project .
 
