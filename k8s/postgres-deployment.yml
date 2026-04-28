@@ -34,6 +34,9 @@ spec:
                 secretKeyRef:
                   name: optima-manage-secret
                   key: DB_NAME
+          envFrom:
+            - configMapRef:
+                name: optima-manage-config
           volumeMounts:
             - name: postgres-storage
               mountPath: /var/lib/postgresql/data

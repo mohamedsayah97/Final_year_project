@@ -13,6 +13,7 @@ import { UserRole } from 'src/utils/enums';
 import { AuthProviders } from './providers/auth.providers';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
+import { CreateUserByAdminDto } from './dtos/createUserByAdmin.dto';
 
 @Injectable()
 export class userService {
@@ -21,59 +22,130 @@ export class userService {
     private readonly authProviders: AuthProviders,
   ) {}
 
-  async registerUserService(registerDto: RegisterDto) {
+  /**
+   * Register a new user (public) - automatically gets ADMIN role
+   * @param registerDto
+   * @returns access token
+   */
+  async registerUserService(registerDto: RegisterDto): Promise<accesTokenType> {
     return this.authProviders.registerUserProvider(registerDto);
   }
 
+  /**
+   * Login user
+   * @param loginDto
+   * @returns access token
+   */
   async loginUserService(loginDto: LoginDto): Promise<accesTokenType> {
     return this.authProviders.loginUserProvider(loginDto);
   }
-  //we used guard here
-  async getCurrentUserService(id: string) {
+
+  /**
+   * Create a new user by admin (protected)
+   * @param createUserDto
+   * @param currentUser
+   * @returns created user
+   */
+  async createUserByAdminService(
+    createUserDto: CreateUserByAdminDto,
+    currentUser: JWTPayloadType,
+  ): Promise<User> {
+    // Verify that the current user is admin (double-check, though guard already does this)
+    if (currentUser.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only administrators can create users');
+    }
+
+    return this.authProviders.createUserByAdminProvider(
+      createUserDto,
+      createUserDto.role,
+    );
+  }
+
+  /**
+   * Get current user by ID
+   * @param id
+   * @returns user
+   */
+  async getCurrentUserService(id: string): Promise<User> {
     const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) throw new NotFoundException('user not found');
+    if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
-  getAll(): Promise<User[]> {
+  /**
+   * Get all users
+   * @returns array of users
+   */
+  async getAll(): Promise<User[]> {
     return this.userRepository.find();
   }
 
+  /**
+   * Update user information
+   * @param id
+   * @param updateUserDto
+   * @returns updated user
+   */
   async updateUserService(
     id: string,
     updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    // Vérifier si l'utilisateur existe
     const user = await this.userRepository.findOne({ where: { id } });
     if (!user) {
-      throw new NotFoundException(`Utilisateur avec l'ID ${id} non trouvé`);
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
 
     const { password, address } = updateUserDto;
 
-    // Mise à jour du mot de passe si fourni
     if (password) {
       const salt = await bcrypt.genSalt(10);
-      // hashage du password avant le sauvegarder dans la BD
       user.password = await bcrypt.hash(password, salt);
     }
 
-    // Mise à jour de l'adresse si fournie
     if (address) {
       user.address = address;
     }
 
-    // Sauvegarder et retourner l'utilisateur mis à jour
     return this.userRepository.save(user);
   }
 
-  async deleteService(id: string, Payload: JWTPayloadType) {
+  /**
+   * Delete a user
+   * @param id
+   * @param Payload
+   * @returns success message
+   */
+  async deleteService(
+    id: string,
+    Payload: JWTPayloadType,
+  ): Promise<{ message: string }> {
     const user = await this.getCurrentUserService(id);
-    //ici sauf l'utilisateur et l'admin qui peuvent supprimer le compte
     if (user.id === Payload?.id || Payload.role === UserRole.ADMIN) {
       await this.userRepository.remove(user);
       return { message: 'User has been deleted' };
     }
-    throw new ForbiddenException('acces denied, you are not allowed');
+    throw new ForbiddenException('Access denied, you are not allowed');
+  }
+
+  /**
+   * Update user role (only admin)
+   * @param userId
+   * @param newRole
+   * @param currentUser
+   * @returns updated user
+   */
+  async updateUserRoleService(
+    userId: string,
+    newRole: UserRole,
+    currentUser: JWTPayloadType,
+  ): Promise<User> {
+    // Only admin can update roles
+    if (currentUser.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only administrators can update user roles');
+    }
+
+    const user = await this.getCurrentUserService(userId);
+    user.role = newRole;
+    return this.userRepository.save(user);
   }
 }

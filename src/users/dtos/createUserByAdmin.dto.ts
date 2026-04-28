@@ -1,8 +1,8 @@
+// dtos/create-user-by-admin.dto.ts
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
-  IsOptional,
   IsPhoneNumber,
   IsString,
   Length,
@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 import { UserRole } from 'src/utils/enums';
 
-export class RegisterDto {
+export class CreateUserByAdminDto {
   @IsNotEmpty()
   @IsString()
   firstName!: string;
@@ -28,7 +28,7 @@ export class RegisterDto {
   password!: string;
 
   @IsNotEmpty()
-  @IsPhoneNumber('TN') // Spécifiez le pays (TN pour Tunisie)
+  @IsPhoneNumber('TN')
   phoneNumber!: string;
 
   @IsNotEmpty()
@@ -36,7 +36,7 @@ export class RegisterDto {
   @Length(5, 100)
   address!: string;
 
-  @IsOptional() // ← Ajouter cette ligne
+  @IsNotEmpty() // Ici le rôle est obligatoire
   @IsEnum(UserRole)
-  role?: UserRole; // ← Rendre optionnel avec ?
+  role!: UserRole; // L'admin choisit le rôle
 }

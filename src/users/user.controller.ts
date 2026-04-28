@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -12,6 +11,7 @@ import {
 import { userService } from './user.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
+import { CreateUserByAdminDto } from './dtos/createUserByAdmin.dto';
 import { AuthGuard } from './guards/auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import type { JWTPayloadType } from 'src/utils/types';
@@ -24,29 +24,57 @@ import { UpdateUserDto } from './dtos/updateUser.dto';
 export class UserController {
   constructor(private readonly userService: userService) {}
 
+  /**
+   * Public endpoint - Register a new user (automatically gets ADMIN role)
+   */
   @Post('register')
-  registerUser(@Body() body: RegisterDto) {
+  async registerUser(@Body() body: RegisterDto) {
     return this.userService.registerUserService(body);
   }
 
+  /**
+   * Public endpoint - Login user
+   */
   @Post('login')
-  loginUser(@Body() body: LoginDto) {
+  async loginUser(@Body() body: LoginDto) {
     return this.userService.loginUserService(body);
   }
 
+  /**
+   * Protected endpoint - Create a new user by admin (admin can specify role)
+   */
+  @Post('create-user')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthRolesGuard)
+  async createUserByAdmin(
+    @Body() body: CreateUserByAdminDto,
+    @CurrentUser() currentUser: JWTPayloadType,
+  ) {
+    return this.userService.createUserByAdminService(body, currentUser);
+  }
+
+  /**
+   * Protected endpoint - Get current user information
+   */
   @Get('current-user')
   @UseGuards(AuthGuard)
-  getCurrentUser(@CurrentUser() payload: JWTPayloadType) {
+  async getCurrentUser(@CurrentUser() payload: JWTPayloadType) {
     return this.userService.getCurrentUserService(payload.id);
   }
 
+  /**
+   * Protected endpoint - Get all users (admin only)
+   */
   @Get('all')
   @Roles(UserRole.ADMIN)
   @UseGuards(AuthRolesGuard)
-  getAllUsers() {
+  async getAllUsers() {
     return this.userService.getAll();
   }
 
+  /**
+   * Protected endpoint - Update current user information
+   */
   @Put()
   @Roles(
     UserRole.ADMIN,
@@ -56,13 +84,16 @@ export class UserController {
     UserRole.stock_manager,
   )
   @UseGuards(AuthRolesGuard)
-  updateUser(
+  async updateUser(
     @CurrentUser() Payload: JWTPayloadType,
     @Body() Body: UpdateUserDto,
   ) {
     return this.userService.updateUserService(Payload.id, Body);
   }
 
+  /**
+   * Protected endpoint - Delete a user by ID
+   */
   @Delete(':id')
   @Roles(
     UserRole.ADMIN,
@@ -72,10 +103,24 @@ export class UserController {
     UserRole.stock_manager,
   )
   @UseGuards(AuthRolesGuard)
-  deleteUser(
-    @Param('id', ParseIntPipe) id: string,
+  async deleteUser(
+    @Param('id') id: string,
     @CurrentUser() Payload: JWTPayloadType,
   ) {
     return this.userService.deleteService(id, Payload);
+  }
+
+  /**
+   * Protected endpoint - Update user role (admin only)
+   */
+  @Put('update-role/:id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthRolesGuard)
+  async updateUserRole(
+    @Param('id') id: string,
+    @Body('role') role: UserRole,
+    @CurrentUser() currentUser: JWTPayloadType,
+  ) {
+    return this.userService.updateUserRoleService(id, role, currentUser);
   }
 }
