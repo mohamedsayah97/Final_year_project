@@ -3,15 +3,34 @@ services:
     image: postgres:15-alpine
     container_name: backend_postgres
     environment:
-      POSTGRES_USER: your_user
-      POSTGRES_PASSWORD: your_password
-      POSTGRES_DB: your_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: optimanageDB
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: backend_app
+    ports:
+      - "3002:3000"
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: admin
+      DB_NAME: optimanageDB
+    networks:
+      - app-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
 
   prometheus:
     image: prom/prometheus

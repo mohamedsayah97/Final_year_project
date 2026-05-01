@@ -1,11 +1,14 @@
+// src/invoices/entity/invoice.entity.ts
 import { User } from 'src/users/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany, // ← Ajouter cet import
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { InvoiceProduct } from './invoice-product.entity'; // ← Ajouter cet import
 
 @Entity({ name: 'invoices' })
 export class Invoice {
@@ -38,4 +41,8 @@ export class Invoice {
 
   @ManyToOne(() => User)
   user!: User;
+
+  // ← Ajouter cette propriété
+  @OneToMany(() => InvoiceProduct, (invoiceProduct) => invoiceProduct.invoice)
+  invoiceProducts!: InvoiceProduct[];
 }

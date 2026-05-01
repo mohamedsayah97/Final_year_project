@@ -16,6 +16,7 @@ import { Worker } from './workers/entity/worker.entity';
 import { User } from './users/entity/user.entity';
 import { Product } from './products/entity/product.entity';
 import { Invoice } from './invoices/entity/invoice.entity';
+import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { Invoice } from './invoices/entity/invoice.entity';
               Worker,
               Product,
               Invoice,
+              InvoiceProduct,
             ],
             dropSchema: true,
             logging: false,
@@ -69,6 +71,7 @@ import { Invoice } from './invoices/entity/invoice.entity';
             User,
             Product,
             Invoice,
+            InvoiceProduct,
           ],
           dropSchema: false, // Nettoie la base avant les tests
           logging: false, // Désactive les logs pour les tests

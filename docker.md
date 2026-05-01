@@ -24,7 +24,7 @@ docker exec -it backend_app sh	/Ouvrir un shell dans le conteneur
 docker rm -f backend_app	/Supprimer le conteneur (force)
 
 # 2. Lancer votre conteneur 
-docker run -d -p 3000:3000 --name backend_app backend_project
+docker run -d -p 3000:3000 --name backend_app optima-manage
 
 # 3. Vérifier que le conteneur tourne
 docker ps
