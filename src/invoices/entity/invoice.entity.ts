@@ -18,10 +18,10 @@ export class Invoice {
   @Column()
   invoiceNumber!: string;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   date!: Date;
 
-  @Column({ type: 'timestamp' })
+  @Column()
   dueDate!: Date;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })

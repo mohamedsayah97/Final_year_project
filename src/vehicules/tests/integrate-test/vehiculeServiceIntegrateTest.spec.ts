@@ -13,6 +13,9 @@ import { User } from 'src/users/entity/user.entity';
 import { Customer } from 'src/customers/entity/customer.entity';
 import { Supplier } from 'src/supplier/entity/supplier.entity';
 import { Worker } from 'src/workers/entity/worker.entity';
+import { Invoice } from 'src/invoices/entity/invoice.entity';
+import { InvoiceProduct } from 'src/invoices/entity/invoice-product.entity';
+import { Product } from 'src/products/entity/product.entity';
 import { CreateVehiculeDto } from '../../dtos/createVehicule.dto';
 import { UpdateVehiculeDto } from '../../dtos/updateVehicule.dto';
 
@@ -41,11 +44,29 @@ describe('VehiculeController Integration Tests', () => {
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
-          entities: [Vehicule, User, Customer, Supplier, Worker],
+          entities: [
+            Vehicule,
+            User,
+            Customer,
+            Supplier,
+            Worker,
+            Product,
+            Invoice,
+            InvoiceProduct,
+          ],
           synchronize: true,
           logging: false,
         }),
-        TypeOrmModule.forFeature([Vehicule, User, Customer, Supplier, Worker]),
+        TypeOrmModule.forFeature([
+          Vehicule,
+          User,
+          Customer,
+          Supplier,
+          Worker,
+          Product,
+          Invoice,
+          InvoiceProduct,
+        ]),
       ],
       controllers: [VehiculeController],
       providers: [VehiculeService],
