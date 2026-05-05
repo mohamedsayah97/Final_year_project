@@ -9,6 +9,7 @@ import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from './customers/entity/customer.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 import { Vehicule } from './vehicules/entity/vehicule.entity';
 import { Supplier } from './supplier/entity/supplier.entity';
 import { SupplierModule } from './supplier/supplier.module';
@@ -17,7 +18,7 @@ import { User } from './users/entity/user.entity';
 import { Product } from './products/entity/product.entity';
 import { Invoice } from './invoices/entity/invoice.entity';
 import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -34,13 +35,18 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        secret:
-          configService.get<string>('JWT_SECRET_KEY') || 'thisIsPrivateKey',
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRE_IN') || '1d',
-        } as any, // 👈 Solution rapide
-      }),
+      useFactory: (configService: ConfigService): JwtModuleOptions => {
+        const expiresIn: number | StringValue =
+          (configService.get<string>('JWT_EXPIRE_IN') as StringValue) || '1d';
+
+        return {
+          secret:
+            configService.get<string>('JWT_SECRET_KEY') || 'thisIsPrivateKey',
+          signOptions: {
+            expiresIn,
+          },
+        };
+      },
       inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({

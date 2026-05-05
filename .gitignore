@@ -65,3 +65,14 @@ Grafana : http://localhost:3001 (admin/admin)
 Prometheus : http://localhost:9090
 
 PostgreSQL : localhost:5432
+
+# Terraform
+/TF/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+.terraform/
+terraform-key.pem
+*.tfplan
+*.log
+EOF
