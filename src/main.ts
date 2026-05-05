@@ -4,7 +4,7 @@ import { setupMetrics } from './utils/metrics.util';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors(['http://localhost:5173']); // Enable CORS for all origins (you can customize this as needed)
   // Setup Prometheus metrics
   setupMetrics(app);
 

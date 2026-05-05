@@ -8,4 +8,3 @@ dist
 *.crt
 .git
 .gitignore
-Dockerfile

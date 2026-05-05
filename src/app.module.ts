@@ -17,6 +17,7 @@ import { User } from './users/entity/user.entity';
 import { Product } from './products/entity/product.entity';
 import { Invoice } from './invoices/entity/invoice.entity';
 import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -29,7 +30,18 @@ import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
     SupplierModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`,
+      envFilePath: '.env.development',
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        secret:
+          configService.get<string>('JWT_SECRET_KEY') || 'thisIsPrivateKey',
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRE_IN') || '1d',
+        } as any, // 👈 Solution rapide
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -62,7 +74,7 @@ import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
           port: parseInt(config.get<string>('DB_PORT') ?? '5432', 10),
           username: config.get<string>('DB_USERNAME') || 'postgres',
           password: config.get<string>('DB_PASSWORD') || 'admin',
-          synchronize: process.env.NODE_ENV !== 'production', // Synchroniser uniquement en développement
+          synchronize: process.env.NODE_ENV !== 'production',
           entities: [
             Customer,
             Vehicule,
@@ -73,16 +85,12 @@ import { InvoiceProduct } from './invoices/entity/invoice-product.entity';
             Invoice,
             InvoiceProduct,
           ],
-          dropSchema: false, // Nettoie la base avant les tests
-          logging: false, // Désactive les logs pour les tests
-          // Fixé la DeprecationWarning: Utiliser extra pour éviter les concurrent queries
+          dropSchema: false,
+          logging: false,
           extra: {
-            // Pool de connexions pour éviter les requêtes concurrentes
             max: 20,
-            // Idle timeout pour libérer les connexions
             idleTimeoutMillis: 30000,
           },
-          // Augmenté le pool max connections pour meilleure gestion des requêtes parallèles
           pool: {
             max: 20,
             min: 2,

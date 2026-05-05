@@ -1,12 +1,13 @@
+// register.dto.ts
 import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsPhoneNumber,
   IsString,
   Length,
   Min,
+  Matches,
 } from 'class-validator';
 import { UserRole } from 'src/utils/enums';
 
@@ -28,7 +29,10 @@ export class RegisterDto {
   password!: string;
 
   @IsNotEmpty()
-  @IsPhoneNumber('TN') // Spécifiez le pays (TN pour Tunisie)
+  @IsString()
+  @Matches(/^(\+216)?[0-9]{8}$/, {
+    message: 'Phone number must be 8 digits or +216 followed by 8 digits',
+  })
   phoneNumber!: string;
 
   @IsNotEmpty()
@@ -36,7 +40,7 @@ export class RegisterDto {
   @Length(5, 100)
   address!: string;
 
-  @IsOptional() // ← Ajouter cette ligne
+  @IsOptional()
   @IsEnum(UserRole)
-  role?: UserRole; // ← Rendre optionnel avec ?
+  role?: UserRole;
 }
