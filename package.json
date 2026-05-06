@@ -22,12 +22,12 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.3",
-    "@nestjs/core": "^11.0.1",
+    "@nestjs/common": "^11.1.17",
+    "@nestjs/config": "^4.0.4",
+    "@nestjs/core": "^11.1.18",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/mapped-types": "^2.1.0",
-    "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/platform-express": "^11.1.18",
     "@nestjs/typeorm": "^11.0.0",
     "bcryptjs": "^3.0.3",
     "class-transformer": "^0.5.1",
@@ -87,5 +87,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "overrides": {
+    "brace-expansion": "2.0.3"
   }
 }
