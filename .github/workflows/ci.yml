@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-   branches: [main, develop]
+    branches: [main, develop]
 
 jobs:
   lint-and-test:
@@ -58,27 +58,24 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Run Snyk security scan (dependencies)
-        uses: snyk/actions/node@v0.4.0
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: test
-          args: --severity-threshold=high
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
-      - name: Run Snyk code scan (source code vulnerabilities)
-        uses: snyk/actions/node@v0.4.0
+      - name: Authenticate Snyk
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: code
-          args: test
+        run: snyk auth $SNYK_TOKEN
+
+      - name: Run Snyk security scan (dependencies)
+        run: snyk test --severity-threshold=high
+        continue-on-error: false
+
+      - name: Run Snyk code scan (source code)
+        run: snyk code test
         continue-on-error: true
 
-      - name: Send snapshot to Snyk dashboard (monitoring)
-        uses: snyk/actions/node@v0.4.0
+      - name: Send snapshot to Snyk dashboard
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          command: monitor
+        run: snyk monitor
         continue-on-error: true
